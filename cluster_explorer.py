@@ -201,7 +201,7 @@ class ClusterExplorerApp(tk.Tk):
                 "This project was developed by:\n"
                 "• Hasan Eid – hasan.eid@lau.edu\n"
                 "• Christ Trad – christ.trad@lau.edu\n"
-                "• Mustafa Zeinedeen – mostapha.zeineddin@lau.edu"
+                "• Mustafa Zein Eldin – mostapha.zeineddin@lau.edu"
             )
 
             close_btn = ttk.Button(container, text="Close", command=win.destroy)
