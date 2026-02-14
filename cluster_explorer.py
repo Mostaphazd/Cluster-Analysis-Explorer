@@ -42,7 +42,7 @@ class ClusterExplorerApp(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.title("Cluster Analysis Explorer (Enhanced)")
+        self.title("Cluster Analysis Explorer")
         self.geometry("1400x800")
 
         # Apply modern theme
@@ -201,7 +201,7 @@ class ClusterExplorerApp(tk.Tk):
                 "This project was developed by:\n"
                 "• Hasan Eid – hasan.eid@lau.edu\n"
                 "• Christ Trad – christ.trad@lau.edu\n"
-                "• Mustafa Zein Eldin – mostapha.zeineddin@lau.edu"
+                "• Mustafa Zeinedeen – mostapha.zeineddin@lau.edu"
             )
 
             close_btn = ttk.Button(container, text="Close", command=win.destroy)
@@ -1564,7 +1564,7 @@ labels = model.fit_predict(X)'''
                 rel_improvements.append(rel)
 
             # threshold for "small improvement" (tune if you like)
-            threshold = 0.25
+            threshold = 0.35
 
             # find first k where improvement drops below threshold
             elbow_k = None
@@ -2586,7 +2586,7 @@ labels = model.fit_predict(X)'''
         self.update_report()
 
         # Check for API key
-        api_key = 'AIzaSyBH71LLI0IYxMckKedDWJOnr8fzZGONTvc' #os.getenv('GEMINI_API_KEY')
+        api_key = 'AIzaSyDbcu8bXTDvjUPBn8gP5z4kVP7lXj8vXsA' #os.getenv('GEMINI_API_KEY')
         if not api_key or api_key == 'your_api_key_here':
             messagebox.showinfo(
                 "No API Key",
