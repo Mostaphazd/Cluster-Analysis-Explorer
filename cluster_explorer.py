@@ -37,6 +37,11 @@ from reportlab.pdfgen import canvas as pdf_canvas
 # For sample datasets
 from sklearn.datasets import load_iris, load_wine, load_breast_cancer, make_blobs
 
+# Sandboxed replacement for the previous bare exec(self.custom_code, ...)
+# call -- see custom_code_sandbox.py for details and the manuscript's
+# Security Considerations section for the full writeup.
+from custom_code_sandbox import run_custom_code_sandboxed, UnsafeCustomCodeError
+
 
 class ClusterExplorerApp(tk.Tk):
     def __init__(self):
@@ -659,7 +664,7 @@ labels = model.fit_predict(X)
 
     def check_api_status(self):
         """Check if Gemini API key is configured."""
-        api_key = 'AIzaSyBH71LLI0IYxMckKedDWJOnr8fzZGONTvc' #os.getenv('GEMINI_API_KEY')
+        api_key = os.getenv('GEMINI_API_KEY')
         if api_key and api_key != 'your_api_key_here':
             self.api_status_label.config(text="✓ Gemini API configured", fg="green")
             return True
@@ -1283,33 +1288,20 @@ labels = model.fit_predict(X)'''
                 self.labels = model.fit_predict(self.X)
 
             elif algo == "custom":
-                # Execute custom code
+                # Execute custom code in an AST-validated, builtins-restricted,
+                # time-limited sandbox (see custom_code_sandbox.py).
                 X = self.X
                 n_samples = len(X)
-
-                # Create execution namespace
-                exec_namespace = {
-                    'X': X,
-                    'n_samples': n_samples,
-                    'np': np,
-                    'pd': pd,
-                }
+                model = None  # a fitted model object is not returned across the sandbox boundary
 
                 try:
-                    exec(self.custom_code, exec_namespace)
-
-                    if 'labels' not in exec_namespace:
-                        messagebox.showerror("Error", "Custom code must set 'labels' variable.")
-                        return
-
-                    self.labels = np.array(exec_namespace['labels'])
-
-                    # Try to get model if defined
-                    if 'model' in exec_namespace:
-                        model = exec_namespace['model']
-                    else:
-                        model = None
-
+                    self.labels = run_custom_code_sandboxed(self.custom_code, X, n_samples)
+                except TimeoutError as e:
+                    messagebox.showerror("Custom Code Error", str(e))
+                    return
+                except UnsafeCustomCodeError as e:
+                    messagebox.showerror("Custom Code Rejected", f"Custom code was blocked by the sandbox:\n{e}")
+                    return
                 except Exception as e:
                     messagebox.showerror("Custom Code Error", f"Error executing custom code:\n{e}")
                     return
@@ -2586,7 +2578,7 @@ labels = model.fit_predict(X)'''
         self.update_report()
 
         # Check for API key
-        api_key = 'AIzaSyDbcu8bXTDvjUPBn8gP5z4kVP7lXj8vXsA' #os.getenv('GEMINI_API_KEY')
+        api_key = os.getenv('GEMINI_API_KEY')
         if not api_key or api_key == 'your_api_key_here':
             messagebox.showinfo(
                 "No API Key",
